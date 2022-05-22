@@ -20,8 +20,9 @@ def docker_info(items: str):
         return { 'containers': output }
     elif items == 'images':
         imgs = client.images.list()
-        output = []
-        [ output.extend(i.tags) for i in imgs ]
+        images = []
+        [ images.extend(i.tags) for i in imgs ]
+        output = [ i.replace('\\','') for i in images ]
         return { 'images': output }
 
 
