@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Response
 import json
 import docker
-import uvicorn
+# import uvicorn
 from redis import Redis
 
 
@@ -28,7 +28,13 @@ def docker_info(items: str):
 
 @app.get('/redis-info')
 def redis_info():
-    keys = r.keys()
+    keys = [
+        'vibration_sensor',
+        'door_state',
+        'rotate_option',
+        'washing_state',
+        'termometr_payload'
+    ]
     values = r.mget(keys)
     output = {}
     for k, v in zip(keys, values):
