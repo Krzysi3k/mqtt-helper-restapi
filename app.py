@@ -40,15 +40,14 @@ def redis_info():
     for k, v in zip(keys, values):
         if v is None:
             continue
-        key = k.decode('utf-8')
         val = v.decode('utf-8')
         if "{" in val:
             obj = json.loads(val)
             if type(obj) is list:
                 obj = obj[-1]
-            output.update({key: obj})
+            output.update({k: obj})
         else:
-            output.update({key: val})
+            output.update({k: val})
     return output
 
 
