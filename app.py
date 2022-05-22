@@ -16,7 +16,8 @@ r = Redis('0.0.0.0', 6379)
 def docker_info(items: str):
     if items == 'containers':
         ctrs = client.containers.list(all=True)
-        return { i.name:i.status for i in ctrs }
+        output = [ f'{i.name} : {i.status}' for i in ctrs ]
+        return { 'containers': output }
     elif items == 'images':
         imgs = client.images.list()
         output = []
@@ -59,4 +60,4 @@ def get_redis_data(data: str):
 
 
 # if __name__ == '__main__':
-#    uvicorn.run(app=app, host='0.0.0.0', port=5000, log_level='error')
+#    uvicorn.run(app=app, host='0.0.0.0', port=5003, log_level='error')
