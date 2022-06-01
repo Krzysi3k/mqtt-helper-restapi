@@ -1,7 +1,8 @@
 from fastapi import FastAPI, Response
 import json
 import docker
-# import uvicorn
+import uvicorn
+import subprocess
 from redis import Redis
 
 
@@ -15,15 +16,23 @@ r = Redis('0.0.0.0', 6379)
 @app.get('/docker-info')
 def docker_info(items: str):
     if items == 'containers':
-        ctrs = client.containers.list(all=True)
-        output = [ f'{i.name} : {i.status}' for i in ctrs ]
+        cached_ctrs = r.get('docker_containers')
+        if cached_ctrs:
+            output = json.loads(cached_ctrs)
+        else:
+            ctrs = client.containers.list(all=True)
+            output = [ f'{i.name} : {i.status}' for i in ctrs ]
+            r.set('docker_containers', json.dumps(output), ex=600)
         return { 'containers': output }
     elif items == 'images':
-        imgs = client.images.list()
-        images = []
-        [ images.extend(i.tags) for i in imgs ]
-        output = [ i.replace('\\','') for i in images ]
-        return { 'images': output }
+        cached_imgs = r.get('docker_images')
+        if cached_imgs:
+            images = json.loads(cached_imgs)
+        else:
+            cli_out = subprocess.run("docker images | awk 'NR>1 {print $1,$2, \"-\" ,$7}'", shell=True, capture_output=True, text=True).stdout.split('\n')
+            images = [img for img in cli_out if img]
+            r.set('docker_images', json.dumps(images), ex=600)
+        return { 'images': images }
 
 
 
