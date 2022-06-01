@@ -18,21 +18,30 @@ def docker_info(items: str):
     if items == 'containers':
         cached_ctrs = r.get('docker_containers')
         if cached_ctrs:
-            output = json.loads(cached_ctrs)
-        else:
-            ctrs = client.containers.list(all=True)
-            output = [ f'{i.name} : {i.status}' for i in ctrs ]
-            r.set('docker_containers', json.dumps(output), ex=600)
+            payload = cached_ctrs.decode('utf-8')
+            output = json.loads(payload)
+            return { 'containers': output }
+        ctrs = client.containers.list(all=True)
+        output = [ f'{i.name} : {i.status}' for i in ctrs ]
+        r.set('docker_containers', json.dumps(output), ex=600)
         return { 'containers': output }
     elif items == 'images':
         cached_imgs = r.get('docker_images')
         if cached_imgs:
-            images = json.loads(cached_imgs)
-        else:
-            cli_out = subprocess.run("docker images | awk 'NR>1 {print $1,$2, \"-\" ,$7}'", shell=True, capture_output=True, text=True).stdout.split('\n')
-            images = [img for img in cli_out if img]
-            r.set('docker_images', json.dumps(images), ex=600)
-        return { 'images': images }
+            payload = cached_imgs.decode('utf-8')
+            images = json.loads(payload)
+            return { 'images': images }
+        cli_out = subprocess.run("docker images | awk 'NR>1 {print $1,$2, \"-\" ,$7}'", shell=True, capture_output=True, text=True).stdout.split('\n')
+        images = [img for img in cli_out if img]
+        payload = []
+        for i in images:
+            img_name, img_size = i.split(' - ')
+            payload.append({
+                'image': img_name,
+                'size': img_size
+            })
+        r.set('docker_images', json.dumps(payload), ex=600)
+        return { 'images': payload }
 
 
 
@@ -74,5 +83,5 @@ def get_redis_data(data: str):
 
 
 
-# if __name__ == '__main__':
-#    uvicorn.run(app=app, host='0.0.0.0', port=5003, log_level='error')
+if __name__ == '__main__':
+   uvicorn.run(app=app, host='0.0.0.0', port=5003, log_level='error')
