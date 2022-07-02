@@ -36,10 +36,9 @@ def docker_info(items: str):
         payload = []
         for i in images:
             img_name, img_size = i.split(' - ')
-            payload.append({
-                'image': img_name,
-                'size': img_size
-            })
+            payload.append(
+                f'{img_name}, {img_size}'
+            )
         r.set('docker_images', json.dumps(payload), ex=600)
         return { 'images': payload }
 
@@ -75,7 +74,7 @@ def redis_info():
 def get_redis_data(data: str):
     try:
         payload = r.get(data).decode('utf-8')
-    except:
+    except AttributeError:
         return { data: 'Not found' }
     if '{' in payload:
         return Response(content=payload, media_type='application/json')
