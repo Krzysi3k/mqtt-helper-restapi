@@ -41,10 +41,10 @@ def push_to_redis(metrics):
 
 if __name__ == '__main__':
     while True:
+        sleep(120)
         try:
             metrics = gather_metrics()
             if metrics:
                 push_to_redis(metrics)
         except Exception as ex:
             print(str(ex))
-        sleep(60)
