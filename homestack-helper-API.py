@@ -1,20 +1,38 @@
-from fastapi import FastAPI, Response
+from fastapi import FastAPI, Response, status
 import json
 import docker
 import uvicorn
 import subprocess
+import time
+# from threading import Thread
 from redis import Redis
-
+# from prometheus_client import start_http_server, Gauge
 
 
 app = FastAPI()
 client = docker.from_env()
 r = Redis('0.0.0.0', 6379)
+# CPU_METRIC = Gauge('cpu_usage_percentage', 'usage of cpu percentage')
+# MEM_METRIC = Gauge('mem_usage_percentage', 'usage of mem Megabytes')
 
+# guwno_lista = ['ema', 'mordko', 'kurwa', 'chamie']
+
+# gaugest_list = [Gauge(f'{i}_usage_percentage', 'usage of cpu percentage') for i in guwno_lista]
+
+
+# def monitoring_runner():
+#     while True:
+#         try:
+#             CPU_METRIC.set(random.randrange(0,100))
+#             MEM_METRIC.set(random.randrange(100,500))
+#         except Exception:
+#             pass
+#         time.sleep(5)
 
 
 @app.get('/docker-info')
 def docker_info(items: str):
+    begin = time.time()
     if items == 'containers':
         cached_ctrs = r.get('docker_containers')
         if cached_ctrs:
@@ -69,12 +87,12 @@ def redis_info():
     return output
 
 
-
 @app.get('/get-redis-data')
-def get_redis_data(data: str):
+def get_redis_data(data: str, response: Response):
     try:
         payload = r.get(data).decode('utf-8')
     except AttributeError:
+        response.status_code = status.HTTP_404_NOT_FOUND
         return { data: 'Not found' }
     if '{' in payload:
         return Response(content=payload, media_type='application/json')
@@ -83,4 +101,6 @@ def get_redis_data(data: str):
 
 
 if __name__ == '__main__':
-   uvicorn.run(app=app, host='0.0.0.0', port=5000, log_level='error')
+    # start_http_server(5001)
+    # Thread(target=monitoring_runner).start()
+    uvicorn.run(app=app, host='0.0.0.0', port=5000, log_level='error')
