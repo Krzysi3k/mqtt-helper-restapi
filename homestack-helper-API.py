@@ -94,7 +94,9 @@ def get_redis_data(data: str, response: Response):
     except AttributeError:
         response.status_code = status.HTTP_404_NOT_FOUND
         return { data: 'Not found' }
-    if '{' in payload:
+    if data == 'docker_metrics_mem' or data == 'docker_metrics_cpu' or data == 'termometr_payload':
+        return Response(content=payload, media_type='text/html')
+    elif '{' in payload:
         return Response(content=payload, media_type='application/json')
     return { 'payload': payload }
 
