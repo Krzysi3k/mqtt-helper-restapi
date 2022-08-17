@@ -52,10 +52,10 @@ def push_to_redis(keyname: str, metric_values: list[Any], header: list[str]):
 
 if __name__ == '__main__':
     sleep(60) # warmup
+    out = subprocess.run('docker ps -q | wc -l', shell=True, capture_output=True, text=True)
+    cnt_num = int(out.stdout)
     while True:
         try:
-            out = subprocess.run('docker ps -q | wc -l', shell=True, capture_output=True, text=True)
-            cnt_num = int(out.stdout)
             gather_metrics(cnt_num)
         except Exception as ex:
             print(str(ex))
