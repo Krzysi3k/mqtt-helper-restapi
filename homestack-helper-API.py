@@ -68,8 +68,8 @@ def redis_info():
         'vibration_sensor',
         'door_state',
         'rotate_option',
-        'washing_state',
-        'termometr_payload'
+        'washing_state'
+        #'termometr_payload'
     ]
     values = r.mget(keys)
     output = {}

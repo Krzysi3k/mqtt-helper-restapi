@@ -23,12 +23,12 @@ def generate_csv(value_row: list[Any], header_row: list[Any] = [], existing_valu
     return current_values
 
 
-def gather_metrics():
+def gather_metrics(cnt_num):
     cmd = 'docker stats --format "{{.Name}} ; {{.CPUPerc}} ; {{.MemUsage}}" --no-stream'
     p = subprocess.run(cmd, shell=True, capture_output=True, text=True)
     containers = p.stdout.splitlines()
-    if containers:
-        current_ts = datetime.now().timestamp()
+    if len(containers) == cnt_num:
+        current_ts = round(datetime.now().timestamp(), 0)
         header_row = [ i.split(';')[0].strip() for i in containers ]
         header_row.append('ts')
         cpu_values = [ round(float(i.split(';')[1].strip().replace('%','')),2) for i in containers ]
@@ -54,7 +54,9 @@ if __name__ == '__main__':
     sleep(60) # warmup
     while True:
         try:
-            gather_metrics()
+            out = subprocess.run('docker ps -q | wc -l', shell=True, capture_output=True, text=True)
+            cnt_num = int(out.stdout)
+            gather_metrics(cnt_num)
         except Exception as ex:
             print(str(ex))
         sleep(60)
