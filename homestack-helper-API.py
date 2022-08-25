@@ -66,10 +66,10 @@ def docker_info(items: str):
 def redis_info():
     keys = [
         'vibration_sensor',
-        'door_state',
-        'rotate_option',
-        'washing_state'
-        #'termometr_payload'
+        'door-state',
+        'rotate-option',
+        'washing-state'
+        #'termometr-payload'
     ]
     values = r.mget(keys)
     output = {}
@@ -94,7 +94,7 @@ def get_redis_data(data: str, response: Response):
     except AttributeError:
         response.status_code = status.HTTP_404_NOT_FOUND
         return { data: 'Not found' }
-    if data == 'docker_metrics_mem' or data == 'docker_metrics_cpu' or data == 'termometr_payload':
+    if data == 'docker-metrics-mem' or data == 'docker-metrics-cpu' or data == 'termometr-payload':
         return Response(content=payload, media_type='text/html')
     elif '{' in payload:
         return Response(content=payload, media_type='application/json')
