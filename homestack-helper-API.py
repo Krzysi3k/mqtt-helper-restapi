@@ -65,7 +65,7 @@ def docker_info(items: str):
 @app.get('/redis-info')
 def redis_info():
     keys = [
-        'vibration_sensor',
+        'vibration-sensor',
         'door-state',
         'rotate-option',
         'washing-state'
