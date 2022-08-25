@@ -34,17 +34,17 @@ r = Redis('0.0.0.0', 6379)
 def docker_info(items: str):
     begin = time.time()
     if items == 'containers':
-        cached_ctrs = r.get('docker_containers')
+        cached_ctrs = r.get('docker-containers')
         if cached_ctrs:
             payload = cached_ctrs.decode('utf-8')
             output = json.loads(payload)
             return { 'containers': output }
         ctrs = client.containers.list(all=True)
         output = [ f'{i.name} : {i.status}' for i in ctrs ]
-        r.set('docker_containers', json.dumps(output), ex=600)
+        r.set('docker-containers', json.dumps(output), ex=600)
         return { 'containers': output }
     elif items == 'images':
-        cached_imgs = r.get('docker_images')
+        cached_imgs = r.get('docker-images')
         if cached_imgs:
             payload = cached_imgs.decode('utf-8')
             images = json.loads(payload)
@@ -57,7 +57,7 @@ def docker_info(items: str):
             payload.append(
                 f'{img_name}, {img_size}'
             )
-        r.set('docker_images', json.dumps(payload), ex=600)
+        r.set('docker-images', json.dumps(payload), ex=600)
         return { 'images': payload }
 
 

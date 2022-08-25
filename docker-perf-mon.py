@@ -41,12 +41,12 @@ def gather_metrics(cnt_num):
 
 
 def push_to_redis(keyname: str, metric_values: list[Any], header: list[str]):
-    current_metrics = r.get(f'docker_metrics_{keyname}')
+    current_metrics = r.get(f'docker-metrics-{keyname}')
     if current_metrics:
         updated_metrics = generate_csv(metric_values, header, current_metrics.decode('utf-8'))
     else:
         updated_metrics = generate_csv(metric_values, header)
-    r.set(f'docker_metrics_{keyname}', updated_metrics)
+    r.set(f'docker-metrics-{keyname}', updated_metrics)
 
 
 
