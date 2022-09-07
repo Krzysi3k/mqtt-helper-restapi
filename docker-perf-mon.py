@@ -59,4 +59,4 @@ if __name__ == '__main__':
             gather_metrics(cnt_num)
         except Exception as ex:
             print(str(ex))
-        sleep(60)
+        sleep(180)
