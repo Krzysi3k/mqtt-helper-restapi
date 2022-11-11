@@ -27,6 +27,19 @@ def gather_metrics(cnt_num):
     cmd = 'docker stats --format "{{.Name}} ; {{.CPUPerc}} ; {{.MemUsage}}" --no-stream'
     p = subprocess.run(cmd, shell=True, capture_output=True, text=True)
     containers = p.stdout.splitlines()
+
+    # todo
+    # 1. separate key for container i.e:
+    #   "docker:nginx-perf"
+    #   "docker:mqtt-handler-perf"
+    
+    # 2. add prefixes to keys i.e "docker:*", "mqtt:*" etc.
+    # for container in containers:
+    #     var = container.split(';')
+    #     cn_name, cn_cpu, cn_mem = var[0], var[1], var[2]
+
+    
+
     if len(containers) == cnt_num:
         current_ts = round(datetime.now().timestamp(), 0)
         header_row = [ i.split(';')[0].strip() for i in containers ]
